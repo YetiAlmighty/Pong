@@ -4,9 +4,10 @@ let player1 = {
     color: 'white',
     paddleHeight: 100,
     x: 0,
-    y: 250,
-};
+    y: 0,
 
+};
+player1.y = game.height / 2 - (player1.paddleHeight / 2);
 let ball = {
     x: game.width / 2,
     y: game.height / 2,
@@ -14,12 +15,16 @@ let ball = {
     color: 'white',
     xSpeed: 10,
     ySpeed: 4,
+    default: {
+        x: game.width / 2,
+        y: game.height / 2,
+    }
 };
 
 window.onload = () => {
     let fps = 1000 / 60;
     setInterval(() => {
-        move();
+        updateBall();
         draw();
     }, fps);
     game.addEventListener('mousemove', event => {
@@ -29,9 +34,9 @@ window.onload = () => {
     });
 };
 
-function move(){
-    updateBall();
-}
+// function move(){
+//     updateBall();
+// }
 
 function draw(){
     // Draw background
@@ -53,14 +58,10 @@ function drawBall(x, y, radius, color){
 
 function updateBall(){
     // Controls ball x movement
-    if (ball.x >= game.width) {
-        //  if its going out of bounds on the right
-        //  reverse
-        ball.xSpeed = -ball.xSpeed;
-    }
-    if (ball.x <= 0){
-        //If its oob on the left
-        ball.xSpeed = -ball.xSpeed;
+    if (ball.x >= game.width || ball.x < 0) {
+        // Reset if out of bounds. Forcing it in
+        // a random direction after
+         ballReset();
     }
 
     if (ball.y >= game.height) {
@@ -97,4 +98,17 @@ function getMousePos(event){
         x: mouseX,
         y: mouseY,
     };
+}
+
+function ballReset() {
+    ball.x = ball.default.x;
+    ball.y = ball.default.y;
+
+    // Randomize the direction depending on if
+    if(Math.round(Math.random())){
+        ball.xSpeed = -ball.xSpeed;
+    }
+    if(Math.round(Math.random())){
+        ball.ySpeed = -ball.ySpeed;
+    }
 }
