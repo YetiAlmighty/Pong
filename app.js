@@ -1,13 +1,10 @@
 let game = document.getElementById('game');
 let gameContext = game.getContext('2d');
-let player1 = {
-    color: 'white',
-    paddleHeight: 100,
-    x: 0,
-    y: 0,
-    score: 0,
-};
-player1.y = game.height / 2 - (player1.paddleHeight / 2);
+let hit1 = new Audio('./hit1.wav');
+let hit2 = new Audio('./hit2.wav');
+game.centerX = game.width / 2;
+game.centerY = game.height / 2;
+
 let ball = {
     x: game.width / 2,
     y: game.height / 2,
@@ -20,6 +17,26 @@ let ball = {
         y: game.height / 2,
     }
 };
+
+let player1 = {
+    color: 'white',
+    paddleHeight: 100,
+    x: 0,
+    y: 0,
+    score: 0,
+    size: 10,
+};
+
+let player2 = {
+    color: 'white',
+    paddleHeight: player1.paddleHeight,
+    x: game.width - 10,
+    y: 0,
+    size: 10,
+    score: 0,
+}
+player1.y = game.centerY - (player1.paddleHeight / 2);
+
 
 window.onload = () => {
     let fps = 1000 / 60;
@@ -38,7 +55,18 @@ function draw(){
     // Draw background
     colorRect(0,0, game.width, game.height, 'black');
     // Draw left paddle
-    colorRect(player1.x, player1.y, 10, 100, player1.color);
+    colorRect(player1.x,
+            player1.y,
+            player1.size,
+            player1.paddleHeight,
+            player1.color);
+    // Draw right paddle
+    colorRect(player2.x,
+            ball.y - (player2.paddleHeight / 2),
+            player2.size,
+            player2.paddleHeight,
+            player2.color);
+    player2.y = ball.y - (player2.paddleHeight / 2);
     // Draw ball
     drawBall(ball.x, ball.y, ball.width, ball.color);
 }
@@ -54,10 +82,21 @@ function drawBall(x, y, radius, color){
 
 function updateBall(){
     // Controls ball x movement
-    if (ball.x <= 10) {
-        // Reset if out of bounds. Forcing it in
-        // a random direction afters
-        if(ball.y > player1.y && ball.y < player1.y + player1.paddleHeight){
+    if (ball.x < 10) {
+
+        if(ball.y > player1.y - 5 && ball.y < player1.y + player1.paddleHeight + 5){
+            hit1.play();
+            ball.xSpeed = -ball.xSpeed;
+        } else {
+            player2.score++;
+            ballReset();
+        }
+    }
+
+    if (ball.x > game.width) {
+
+        if(ball.y > player2.y && ball.y < player2.y + player2.paddleHeight){
+            hit2.play();
             ball.xSpeed = -ball.xSpeed;
         } else {
             player1.score++;
@@ -65,9 +104,6 @@ function updateBall(){
         }
     }
 
-    if(ball.x > game.width){
-        ball.xSpeed = -ball.xSpeed;
-    }
 
     if (ball.y >= game.height) {
         // bottom of the canvas
