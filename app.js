@@ -5,7 +5,7 @@ let player1 = {
     paddleHeight: 100,
     x: 0,
     y: 0,
-
+    score: 0,
 };
 player1.y = game.height / 2 - (player1.paddleHeight / 2);
 let ball = {
@@ -34,10 +34,6 @@ window.onload = () => {
     });
 };
 
-// function move(){
-//     updateBall();
-// }
-
 function draw(){
     // Draw background
     colorRect(0,0, game.width, game.height, 'black');
@@ -58,10 +54,19 @@ function drawBall(x, y, radius, color){
 
 function updateBall(){
     // Controls ball x movement
-    if (ball.x >= game.width || ball.x < 0) {
+    if (ball.x <= 10) {
         // Reset if out of bounds. Forcing it in
-        // a random direction after
-         ballReset();
+        // a random direction afters
+        if(ball.y > player1.y && ball.y < player1.y + player1.paddleHeight){
+            ball.xSpeed = -ball.xSpeed;
+        } else {
+            player1.score++;
+            ballReset();
+        }
+    }
+
+    if(ball.x > game.width){
+        ball.xSpeed = -ball.xSpeed;
     }
 
     if (ball.y >= game.height) {
