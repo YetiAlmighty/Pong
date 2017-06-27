@@ -1,7 +1,7 @@
 let game = document.getElementById('game');
 let gameContext = game.getContext('2d');
-let hit1 = new Audio('./assets/hit1.wav');
-let hit2 = new Audio('./assets/hit2.wav');
+var hit1 = new Audio('./hit1.wav');
+var hit2 = new Audio('./hit2.wav');
 game.centerX = game.width / 2;
 game.centerY = game.height / 2;
 
