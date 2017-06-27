@@ -24,7 +24,8 @@ window.onload = () => {
     }, fps);
     game.addEventListener('mousemove', event => {
         let mousePos = getMousePos(event);
-        player1.y = mousePos.y;
+        // Centers the paddle where the mouse is
+        player1.y = mousePos.y - (player1.paddleHeight / 2);
     });
 };
 
