@@ -56,7 +56,7 @@ window.onload = () => {
     });
 };
 function comp1(){
-    let center = player2.y + (player2.paddleHeight / 2)
+    let center = player2.y + (player2.paddleHeight / 2);
     if (center < ball.y - 35) {
         player2.y += 6;
     } else if(center > ball.y + 35){
