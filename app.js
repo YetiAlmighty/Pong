@@ -3,7 +3,7 @@ let gameContext = game.getContext('2d');
 let hit1 = new Audio('./hit1.wav');
 let hit2 = new Audio('./hit2.wav');
 let maxScore = 5;
-let gameOver = false;
+let gameOver = true;
 
 game.centerX = game.width / 2;
 game.centerY = game.height / 2;
@@ -46,13 +46,17 @@ player1.y = game.centerY - (player1.paddleHeight / 2);
 window.onload = () => {
     let fps = 1000 / 60;
     setInterval(() => {
-        updateBall();
         draw();
     }, fps);
     game.addEventListener('mousemove', event => {
         let mousePos = getMousePos(event);
         // Centers the paddle where the mouse is
         player1.y = mousePos.y - (player1.paddleHeight / 2);
+    });
+    game.addEventListener('mousedown', () => {
+        player1.score = 0;
+        player2.score = 0;
+        gameOver = false;
     });
 };
 function comp1(){
@@ -69,10 +73,13 @@ function draw(){
         gameContext.fillStyle = 'white';
         let winner = player1.score > player2.score ? '1' : '2';
         gameContext.fillText(`GAME OVER - PLAYER ${winner} WINS`, game.centerX - 50, game.centerY);
+        gameContext.fillText('Click to continue', game.centerX - 25, game.centerY + 20);
     } else {
+        updateBall();
         comp1();
         // Draw background
         colorRect(0,0, game.width, game.height, 'black');
+        drawNet();
         // Draw left paddle
         colorRect(player1.x,
                 player1.y,
@@ -166,8 +173,6 @@ function getMousePos(event){
 
 function ballReset() {
     if(player1.score >= maxScore || player2.score >= maxScore){
-        player1.score = 0;
-        player2.score = 0;
         gameOver = true;
     } else {
         ball.x = ball.default.x;
@@ -181,5 +186,11 @@ function ballReset() {
         if(Math.round(Math.random())){
             ball.ySpeed = -ball.ySpeed;
         }
+    }
+}
+
+function drawNet(){
+    for (var i = 0; i < game.height; i+= 40) {
+        colorRect(game.width/2-1, i, 2, 20, 'white');
     }
 }
