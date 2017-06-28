@@ -1,7 +1,10 @@
 let game = document.getElementById('game');
 let gameContext = game.getContext('2d');
-var hit1 = new Audio('./hit1.wav');
-var hit2 = new Audio('./hit2.wav');
+let hit1 = new Audio('./hit1.wav');
+let hit2 = new Audio('./hit2.wav');
+let maxScore = 5;
+let gameOver = false;
+
 game.centerX = game.width / 2;
 game.centerY = game.height / 2;
 
@@ -15,6 +18,8 @@ let ball = {
     default: {
         x: game.width / 2,
         y: game.height / 2,
+        xSpeed: 10,
+        ySpeed: 4,
     }
 };
 
@@ -50,25 +55,42 @@ window.onload = () => {
         player1.y = mousePos.y - (player1.paddleHeight / 2);
     });
 };
-
+function comp1(){
+    let center = player2.y + (player2.paddleHeight / 2)
+    if (center < ball.y - 35) {
+        player2.y += 6;
+    } else if(center > ball.y + 35){
+        player2.y -= 6;
+    }
+}
 function draw(){
-    // Draw background
-    colorRect(0,0, game.width, game.height, 'black');
-    // Draw left paddle
-    colorRect(player1.x,
-            player1.y,
-            player1.size,
-            player1.paddleHeight,
-            player1.color);
-    // Draw right paddle
-    colorRect(player2.x,
-            ball.y - (player2.paddleHeight / 2),
-            player2.size,
-            player2.paddleHeight,
-            player2.color);
-    player2.y = ball.y - (player2.paddleHeight / 2);
-    // Draw ball
-    drawBall(ball.x, ball.y, ball.width, ball.color);
+    if(gameOver){
+        colorRect(0,0, game.width, game.height, 'black');
+        gameContext.fillStyle = 'white';
+        let winner = player1.score > player2.score ? '1' : '2';
+        gameContext.fillText(`GAME OVER - PLAYER ${winner} WINS`, game.centerX - 50, game.centerY);
+    } else {
+        comp1();
+        // Draw background
+        colorRect(0,0, game.width, game.height, 'black');
+        // Draw left paddle
+        colorRect(player1.x,
+                player1.y,
+                player1.size,
+                player1.paddleHeight,
+                player1.color);
+        // Draw right paddle
+        colorRect(player2.x,
+                player2.y,
+                player2.size,
+                player2.paddleHeight,
+                player2.color);
+        // Draw ball
+        drawBall(ball.x, ball.y, ball.width, ball.color);
+        //Draw Scores
+        gameContext.fillText(player1.score,100, 50);
+        gameContext.fillText(player2.score, game.width - 100, 50);
+    }
 }
 
 function drawBall(x, y, radius, color){
@@ -84,9 +106,11 @@ function updateBall(){
     // Controls ball x movement
     if (ball.x < 10) {
 
-        if(ball.y > player1.y - 5 && ball.y < player1.y + player1.paddleHeight + 5){
+        if(ball.y > player1.y - 10 && ball.y < player1.y + player1.paddleHeight + 10){
             hit1.play();
             ball.xSpeed = -ball.xSpeed;
+            let center = ball.y - (player1.y + player1.paddleHeight /2);
+            ball.ySpeed = center * 0.35;
         } else {
             player2.score++;
             ballReset();
@@ -95,7 +119,7 @@ function updateBall(){
 
     if (ball.x > game.width) {
 
-        if(ball.y > player2.y && ball.y < player2.y + player2.paddleHeight){
+        if(ball.y > player2.y - 10 && ball.y < player2.y + player2.paddleHeight + 10){
             hit2.play();
             ball.xSpeed = -ball.xSpeed;
         } else {
@@ -103,7 +127,6 @@ function updateBall(){
             ballReset();
         }
     }
-
 
     if (ball.y >= game.height) {
         // bottom of the canvas
@@ -142,14 +165,21 @@ function getMousePos(event){
 }
 
 function ballReset() {
-    ball.x = ball.default.x;
-    ball.y = ball.default.y;
-
-    // Randomize the direction depending on if
-    if(Math.round(Math.random())){
-        ball.xSpeed = -ball.xSpeed;
-    }
-    if(Math.round(Math.random())){
-        ball.ySpeed = -ball.ySpeed;
+    if(player1.score >= maxScore || player2.score >= maxScore){
+        player1.score = 0;
+        player2.score = 0;
+        gameOver = true;
+    } else {
+        ball.x = ball.default.x;
+        ball.y = ball.default.y;
+        ball.xSpeed = ball.default.xSpeed;
+        ball.ySpeed = ball.default.ySpeed;
+        // Randomize the direction depending on if
+        if(Math.round(Math.random())){
+            ball.xSpeed = -ball.xSpeed;
+        }
+        if(Math.round(Math.random())){
+            ball.ySpeed = -ball.ySpeed;
+        }
     }
 }
